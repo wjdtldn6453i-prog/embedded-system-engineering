@@ -1,0 +1,79 @@
+## 아두이노 코드
+
+```cpp
+const int LED_PIN = 9;  // PWM 핀(~ 표시)
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    String line = Serial.readStringUntil('\n');
+    int value = constrain(line.toInt(), 0, 255);
+    analogWrite(LED_PIN, value);
+  }
+}
+```
+
+## p5.js 코드 (sketch.js)
+
+```javascript
+let slider, connectBtn;
+let port, writer;
+let lastSent = -1;
+let status = '연결 안 됨';
+
+function setup() {
+  createCanvas(400, 220);
+  connectBtn = createButton('아두이노 연결');
+  connectBtn.mousePressed(connectSerial);
+  createElement('br');
+  slider = createSlider(0, 255, 0, 1);
+  slider.style('width', '380px');
+}
+
+async function connectSerial() {
+  if (!('serial' in navigator)) {
+    status = 'Web Serial 미지원 (Chrome 사용)';
+    return;
+  }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+    const encoder = new TextEncoderStream();
+    encoder.readable.pipeTo(port.writable);
+    writer = encoder.writable.getWriter();
+    status = '연결됨';
+    lastSent = -1;
+  } catch (err) {
+    status = '연결 실패: ' + err.message;
+  }
+}
+
+function draw() {
+  background(30);
+  const value = slider.value();
+
+  noStroke();
+  fill(255, 60, 60, value);
+  circle(width / 2, 90, 100);
+
+  fill(255);
+  textAlign(CENTER);
+  textSize(16);
+  text('밝기: ' + value + ' / 255', width / 2, 175);
+  textSize(13);
+  text('상태: ' + status, width / 2, 200);
+
+  if (writer && value !== lastSent) {
+    writer.write(value + '\n');
+    lastSent = value;
+  }
+}
+```
+
+## 회로
+- LED 긴 다리(+) → 220Ω 저항 → 9번 핀
+- LED 짧은 다리(-) → GND
