@@ -1,3 +1,5 @@
+
+
 ## 아두이노 코드
 
 ```cpp
@@ -73,5 +75,10 @@ function draw() {
   }
 }
 ```
+
+실행영상
+https://github.com/user-attachments/assets/51951183-5262-464f-811e-b31e257668ba
+fritzing으로 그린 회로도
+<img width="923" height="577" alt="image" src="https://github.com/user-attachments/assets/94f7954f-2c32-42f3-8ad7-b3e58e616133" />
 
 
